@@ -74,17 +74,49 @@ function newUserInsert( $id, $name, $pass, $category ) {
 	mysql_query( $query );
 }
 
-function bookList() {
-	$query = "SELECT * FROM book";
+/**
+ * @return books available, i.e number of copies > 0
+ */
+function bookList( $uid ) {
+	$query = "SELECT * FROM book WHERE availibility > 0 AND id NOT IN ( SELECT bid from `transaction` WHERE uid='$uid' )" ;
 	$result = mysql_query( $query );
 	return $result;
 }
 
+/**
+ * @param book id
+ * @param user id
+ * sets the books availibility one less.
+ */
 function bookBorrow( $bid, $uid ) {
-	$query = "INSERT INTO `transaction` VALUES( '', $bid, $uid, SYSDATE(), '' )";
+	$query = "INSERT INTO `transaction` VALUES( '', $bid, $uid, SYSDATE(), '', 0 )";
 	mysql_query( $query );
 	$query = "UPDATE book SET availibility=availibility-1 where id='$bid'";
 	mysql_query( $query );
+}
+
+/**
+ * books to be borrowed confirmation check
+ */
+function bookConfirmCheck( $uid ) {
+    $query = "SELECT * FROM book WHERE id in ( SELECT bid from `transaction` WHERE uid='$uid' AND confirm=0 )";
+    $result = mysql_query( $query );
+    return $result;
+}
+
+/**
+ * cancels from confirmation list
+ */
+function bookBorrowRemove( $bid, $uid ) {
+    $query = "DELETE FROM `transaction` WHERE uid='$uid' AND bid='$bid'";
+    $result = mysql_query( $query );
+    $query = "UPDATE book SET availibility=availibility+1 where id='$bid'";
+    mysql_query( $query );
+}
+
+function confirmBorrow( $uid ) {
+    $query = "UPDATE `transaction` SET confirm=1 WHERE uid='$uid'";
+    mysql_query( $query );
 }
 
 function bookAdd( $name, $price, $info, $availibility ) {
@@ -129,7 +161,7 @@ function returnBooks( $bid, $uid ) {
 	$res = mysql_query($query);
 	$res = mysql_fetch_assoc( $res );
 	$res = $res["fine"];
-	echo $res;
+	//echo $res;
 	if( $res > 3 ) {
 		$res = ( $res - 3 ) * 20;
 		$query = "SELECT `fine` FROM `user` WHERE `id` = $uid";
