@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Mar 12, 2014 at 08:28 PM
+-- Generation Time: Mar 15, 2014 at 10:45 PM
 -- Server version: 5.5.34
 -- PHP Version: 5.4.22
 
@@ -40,14 +40,14 @@ CREATE TABLE IF NOT EXISTS `book` (
 --
 
 INSERT INTO `book` (`id`, `name`, `price`, `info`, `availibility`) VALUES
-(1, 'Let Us C', 100, 'Yashwant Kanetwar', 0),
-(2, 'Teach yourself C++', 100, 'Harbert Schield', 0),
-(3, 'Intro to Algorithms', 5000, 'Cormen', 1),
-(4, 'PHP tutorials', 200, '', 1),
-(5, 'c++', 100, 'programming', 27),
-(6, 'riyan', 123, 'asdf', 12),
-(7, 'skfjdbvks', 23, 'df', 12),
-(8, 'sfdnkjbvsn', 123, 'adsfgh', 1);
+(1, 'Let Us C', 100, 'Yashwant Kanetwar', 15),
+(2, 'Teach yourself C++', 100, 'Harbert Schield', 1),
+(3, 'Intro to Algorithms', 5000, 'Cormen', 15),
+(4, 'PHP tutorials', 200, 'W3 Schools', 19),
+(5, 'c++', 100, 'programming', 9),
+(6, 'Linux System Administrator', 123, 'Shah, Soyinka', 19),
+(7, 'Concrete Mathematics', 23, 'Graham, Knuth, Patashnik', 7),
+(8, 'Discrete Mathematics', 123, 'Rosen', 7);
 
 -- --------------------------------------------------------
 
@@ -74,13 +74,22 @@ CREATE TABLE IF NOT EXISTS `transaction` (
   `uid` int(15) NOT NULL,
   `borrow` date NOT NULL,
   `rdate` date DEFAULT NULL,
+  `confirm` int(1) DEFAULT '0',
   PRIMARY KEY (`sidx`),
   UNIQUE KEY `bid` (`bid`),
   UNIQUE KEY `bid_2` (`bid`),
   UNIQUE KEY `bid_3` (`bid`),
   UNIQUE KEY `bid_4` (`bid`),
   UNIQUE KEY `sidx` (`sidx`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=54 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_bin AUTO_INCREMENT=80 ;
+
+--
+-- Dumping data for table `transaction`
+--
+
+INSERT INTO `transaction` (`sidx`, `bid`, `uid`, `borrow`, `rdate`, `confirm`) VALUES
+(78, 3, 30, '2014-03-16', '0000-00-00', 1),
+(79, 6, 30, '2014-03-16', '0000-00-00', 1);
 
 -- --------------------------------------------------------
 
