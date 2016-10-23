@@ -16,7 +16,7 @@ $result = returnBookList();
 ?>
 
 <?php
-while( $row = mysql_fetch_assoc( $result ) ) {
+while( $row = mysqli_fetch_assoc( $result ) ) {
 	$bid = $row["bid"];
 	$uid = $row["uid"];
 	$bdate = $row["borrow"];

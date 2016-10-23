@@ -8,7 +8,7 @@ if( isset($_POST['submit']) ) {
 	$err1 = "";
 	$err3 = "";
 	$err4 = "";
-	$name = mysql_real_escape_string( $_POST['uname'] );
+	$name = mysqli_real_escape_string( getDBConnection(), $_POST['uname'] );
 	$pass = $_POST['upass'];
 	if( $name == "" || $pass == "" ) { // username or password field empty.
 		if( $name == "" ) $err1 = "<span style='color:red'>Name can not be empty.</span>";

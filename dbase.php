@@ -1,6 +1,10 @@
 <?php
-$con = mysql_connect( 'localhost', 'root', '' ); // databse connection
-mysql_select_db( 'library', $con ); // selecting database
+$con = mysqli_connect( 'localhost', 'root', '', 'library' ); // databse connection
+//mysqli_select_db( getDBConnection(), 'library' ); // selecting database
+
+function getDBConnection() {
+	return mysqli_connect( 'localhost', 'root', '', 'library' );
+}
 
 /** checks a user is already registered or not at registration.php page.
 	returns true if user exists at user/newuser tables.
@@ -8,12 +12,12 @@ mysql_select_db( 'library', $con ); // selecting database
  */
 function checkUser( $name ) {
 	$query = "SELECT * FROM user WHERE name='$name'";
-	$result = mysql_query( $query );
-	if( mysql_num_rows( $result ) == 1 ) return true; // username exists
+	$result = mysqli_query( getDBConnection(),  $query );
+	if( mysqli_num_rows( $result ) == 1 ) return true; // username exists
 
 	$query = "SELECT * FROM newuser WHERE name='$name'"; 
-	$result = mysql_query( $query );
-	if( mysql_num_rows( $result ) == 1 ) return true; // username exists
+	$result = mysqli_query( getDBConnection(),  $query );
+	if( mysqli_num_rows( $result ) == 1 ) return true; // username exists
 
 	return false;
 }
@@ -21,7 +25,7 @@ function checkUser( $name ) {
 /*	this method registers an user at registration.php page. */
 function registerUser( $uname, $pass ) {
 	$query = "INSERT INTO `newuser` VALUES('', '$uname', '$pass')";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 }
 
 /** *checks the user is an admin or not by checking its category.
@@ -29,10 +33,11 @@ function registerUser( $uname, $pass ) {
 	*returns true if it is an user. returns false otherwise.
   */
 function checkAdmin( $uname ) {
+	//$uname = mysqli_real_escape_string( getDBConnection(), $uname );
 	$query = "SELECT * FROM user WHERE name='$uname'";
 	echo $query;
-	$result = mysql_query( $query );
-	$row = mysql_fetch_assoc( $result );
+	$result = mysqli_query( getDBConnection(),  $query );
+	$row = mysqli_fetch_assoc( $result );
 	$_SESSION["name"] = $row["name"];
 	$_SESSION["id"] = $row["id"];
 	if( $row[ "category" ] == 0 ) return true; // admin
@@ -46,10 +51,10 @@ function checkAdmin( $uname ) {
 */
 function validateUser( $name, $pass ) {
 	$query = "SELECT * FROM user WHERE name='$name' AND password=MD5('$pass')";
-	echo $query;
-	$result = mysql_query( $query );
-	$rows = mysql_fetch_assoc( $result );
-	if( mysql_num_rows( $result ) == 0 ) return false; // username or password doesn't match
+    //	echo $query;
+	$result = mysqli_query( getDBConnection(),  $query );
+	$rows = mysqli_fetch_assoc( $result );
+	if( mysqli_num_rows( $result ) == 0 ) return false; // username or password doesn't match
 	return true; // username and password match
 }
 
@@ -58,7 +63,7 @@ function validateUser( $name, $pass ) {
  */	
 function newUserList() {
 	$query = "SELECT * FROM newuser";
-	$result = mysql_query( $query );
+	$result = mysqli_query( getDBConnection(),  $query );
 	return $result;
 }
 
@@ -66,12 +71,12 @@ function newUserList() {
 */
 function newUserDelete( $name ) {
 	$query = "DELETE FROM newuser WHERE name='$name'";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 }
 
 function newUserInsert( $id, $name, $pass, $category ) {
 	$query = "INSERT INTO user VALUES( $id, '$name', '$pass', $category, 0 )";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 }
 
 /**
@@ -79,7 +84,7 @@ function newUserInsert( $id, $name, $pass, $category ) {
  */
 function bookList( $uid ) {
 	$query = "SELECT * FROM book WHERE availibility > 0 AND id NOT IN ( SELECT bid from `transaction` WHERE uid='$uid' )" ;
-	$result = mysql_query( $query );
+	$result = mysqli_query( getDBConnection(),  $query );
 	return $result;
 }
 
@@ -90,9 +95,9 @@ function bookList( $uid ) {
  */
 function bookBorrow( $bid, $uid ) {
 	$query = "INSERT INTO `transaction` VALUES( '', $bid, $uid, SYSDATE(), '', 0 )";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 	$query = "UPDATE book SET availibility=availibility-1 where id='$bid'";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 }
 
 /**
@@ -100,7 +105,7 @@ function bookBorrow( $bid, $uid ) {
  */
 function bookConfirmCheck( $uid ) {
     $query = "SELECT * FROM book WHERE id in ( SELECT bid from `transaction` WHERE uid='$uid' AND confirm=0 )";
-    $result = mysql_query( $query );
+    $result = mysqli_query( getDBConnection(),  $query );
     return $result;
 }
 
@@ -109,14 +114,14 @@ function bookConfirmCheck( $uid ) {
  */
 function bookBorrowRemove( $bid, $uid ) {
     $query = "DELETE FROM `transaction` WHERE uid='$uid' AND bid='$bid'";
-    $result = mysql_query( $query );
+    $result = mysqli_query( getDBConnection(),  $query );
     $query = "UPDATE book SET availibility=availibility+1 where id='$bid'";
-    mysql_query( $query );
+    mysqli_query( getDBConnection(),  $query );
 }
 
 function confirmBorrow( $uid ) {
     $query = "UPDATE `transaction` SET confirm=1 WHERE uid='$uid'";
-    mysql_query( $query );
+    mysqli_query( getDBConnection(),  $query );
 }
 
 function bookAdd( $name, $price, $info, $availibility ) {
@@ -126,61 +131,61 @@ function bookAdd( $name, $price, $info, $availibility ) {
 
 	$query = "INSERT INTO `book` VALUES( '', '".$name."', ".$price.", '".$info."', ".$availibility." )";
 	echo $query."<br>";
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 }
 
 function findBook( $name ) {
 	$query = "SELECT * FROM `book` WHERE name='$name'";
-	$rs = mysql_query($query);
-	if( mysql_num_rows($rs) == 0 ) return true;
+	$rs = mysqli_query($query);
+	if( mysqli_num_rows($rs) == 0 ) return true;
 	else return false;
 }
 
 function bookDelete( $bname ) {
 	$query = "DELETE FROM book WHERE name='$bname'";
-	mysql_query( $query );	
+	mysqli_query( getDBConnection(),  $query );	
 }
 
 function bookModify( $name, $price, $info, $availibility ) {
 	$query = "UPDATE book SET availibility='$availibility' price='$price' info='$info' where name='$name'";
-	mysql_query( $query );	
+	mysqli_query( getDBConnection(),  $query );	
 }
 
 function returnBookList() {
 	$query = "SELECT * FROM `transaction` WHERE `borrow` > `rdate`";
-	$result = mysql_query( $query );
+	$result = mysqli_query( getDBConnection(),  $query );
 	return $result;
 }
 
 function returnBooks( $bid, $uid ) {
 	$query = "UPDATE `transaction` SET `rdate`=SYSDATE() WHERE `bid`=$bid AND `uid`=$uid";
-	mysql_query($query);
+	mysqli_query($query);
 	$query = "UPDATE `book` SET `availibility`=availibility+1 WHERE `id`=$bid" ;
-	mysql_query( $query );
+	mysqli_query( getDBConnection(),  $query );
 	$query = "SELECT `rdate` - `borrow` AS fine FROM `transaction` WHERE `bid` =$bid AND `uid`=$uid";
-	$res = mysql_query($query);
-	$res = mysql_fetch_assoc( $res );
+	$res = mysqli_query($query);
+	$res = mysqli_fetch_assoc( $res );
 	$res = $res["fine"];
 	//echo $res;
 	if( $res > 3 ) {
 		$res = ( $res - 3 ) * 20;
 		$query = "SELECT `fine` FROM `user` WHERE `id` = $uid";
-		$result = mysql_query( $query );
+		$result = mysqli_query( getDBConnection(),  $query );
 		//echo $query;
-		$result = mysql_fetch_assoc( $result );
+		$result = mysqli_fetch_assoc( $result );
 		$res = $res + $result["fine"]; 
 		$query = "UPDATE `user` SET `fine`=$res WHERE `id`=$uid";
-		mysql_query($query);
+		mysqli_query($query);
 	}
 	$query = "DELETE FROM `transaction` WHERE `bid` = $bid AND `uid` = $uid";
-	mysql_query($query);
+	mysqli_query($query);
 }
 
 function userFine( $uid ) {
 	$query = "SELECT fine FROM user WHERE id = $uid";
-	$result = mysql_query( $query );
+	$result = mysqli_query( getDBConnection(),  $query );
 	//echo $query;
-	$result = mysql_fetch_assoc( $result );
+	$result = mysqli_fetch_assoc( $result );
 	return $result["fine"];
 }
 ?>

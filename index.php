@@ -7,7 +7,7 @@ _header('Library Management System');
 
 $err = "";
 if( isset( $_POST["submit"] ) ){
-	$name = mysql_real_escape_string( trim( $_POST["uname"] ) );
+	$name = mysqli_real_escape_string( $con, trim( $_POST["uname"] ) );
 	$pass = $_POST["upass"];
 	$res = validateUser( $name, $pass );
 	if( $res == false ) { // username or password doesn't match

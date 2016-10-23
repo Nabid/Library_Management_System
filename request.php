@@ -20,7 +20,7 @@ $result = newUserList();
 ?>
 
 <?php
-while( $row = mysql_fetch_assoc( $result ) ) {
+while( $row = mysqli_fetch_assoc( $result ) ) {
 	$name = $row["name"];
 	$id = $row["id"];
 	echo $id."~";
